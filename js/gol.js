@@ -1,3 +1,5 @@
+let pixelRatio = window.devicePixelRatio;
+
 /**
  * Game of Life simulation and display.
  * @param {HTMLCanvasElement} canvas Render target
@@ -11,12 +13,18 @@ function GOL(canvas, scale) {
         throw new Error('No WebGL');
     }
     scale = this.scale = scale || 4;
+    canvas.width = $(canvas).width() * pixelRatio;
+    canvas.height = $(canvas).height() * pixelRatio;
     var w = canvas.width, h = canvas.height;
     this.viewsize = new Float32Array([w, h]);
     this.statesize = new Float32Array([w / scale, h / scale]);
     this.timer = null;
     this.lasttick = GOL.now();
     this.fps = 0;
+
+    this.width = w;
+    this.height = h;
+    console.log(w, h)
 
     gl.disable(gl.DEPTH_TEST);
     this.programs = {
@@ -104,8 +112,10 @@ GOL.prototype.setRandom = function(p) {
     p = p == null ? 0.5 : p;
     var rand = new Uint8Array(size);
     for (var i = 0; i < size; i++) {
-        rand[i] = Math.random() < p ? 1 : 0;
+        //rand[i] = Math.random() < p ? 1 : 0;
+        rand[i] = 0;
     }
+    //rand[Math.floor(rand.length/2)] = 1;
     this.set(rand);
     return this;
 };
@@ -201,17 +211,52 @@ GOL.prototype.get = function() {
     return state;
 };
 
+GOL.prototype.periodic_poke = function() {
+    if(this.counter === undefined) {
+        this.counter = 0;
+    }
+    //if(this.counter == 0) {
+    if(Math.random() < 0.1) {
+    //if(this.counter % 7 === 0 && this.counter < 200) {
+        this.poke(Math.round(this.width/2), Math.round(this.height/2), 1);
+    }
+    gol.step();
+    gol.draw();
+    this.counter++
+}
+
 /**
  * Run the simulation automatically on a timer.
  * @returns {GOL} this
  */
 GOL.prototype.start = function() {
-    if (this.timer == null) {
-        this.timer = setInterval(function(){
-            gol.step();
-            gol.draw();
-        }, 60);
+    // array containing neighbor grid coordinates
+    this.neighbors = new Float32Array([
+        [-1, -1], [-1,  0], [-1,  1],
+        [ 0, -1], [ 0,  0], [ 0,  1],
+        [ 1, -1], [ 1,  0], [ 1,  1],
+    ].flat());
+
+    this.modulo = 3;
+    
+    this.programs.gol.use().uniform('modulo', this.modulo);
+    //debugger;
+    //var neighbors_location = this.programs.gol.gl.getUniformLocation(this.programs.gol.program, "neighbors");
+    //this.programs.gol.gl.uniform2fv(neighbors_location, this.neighbors);
+
+    //this.programs.gol.use().uniform('neighbors', this.neighbors);
+
+    this.timer = true;
+    let frame = () => {
+        window.requestAnimationFrame(() => {
+            gol.periodic_poke();
+            if(this.timer) {
+                frame();
+            }
+        })
     }
+    frame();
+
     return this;
 };
 
@@ -245,11 +290,19 @@ GOL.prototype.toggle = function() {
 GOL.prototype.eventCoord = function(event) {
     var $target = $(event.target),
         offset = $target.offset(),
-        border = 1,
-        x = event.pageX - offset.left - border,
-        y = $target.height() - (event.pageY - offset.top - border);
-    return [Math.floor(x / this.scale), Math.floor(y / this.scale)];
+        border = 0,
+        x = event.pageX * pixelRatio - offset.left - border,
+        y = $target.height() * pixelRatio - (event.pageY - offset.top - border) * pixelRatio;
+    return [Math.round((x) / this.scale), Math.round((y) / this.scale)];
 };
+
+GOL.prototype.paint_in = function(x, y) {
+    gol.poke(x, y, 1);
+    gol.poke(x+1, y+1, 1);
+    gol.poke(x, y+1, 1);
+    gol.poke(x+1, y, 1);
+    gol.draw();
+}
 
 /**
  * Manages the user interface for a simulation.
@@ -262,8 +315,26 @@ function Controller(gol) {
     $canvas.on('mousedown', function(event) {
         _this.drag = event.which;
         var pos = gol.eventCoord(event);
-        gol.poke(pos[0], pos[1], _this.drag == 1);
-        gol.draw();
+        var [x, y] = pos;
+
+        console.log(x, y);
+
+        // var brush = [
+        //     [0, 0, 0, 0, 0, 0, 0, 0],
+        //     [0, 0, 0, 1, 0, 0, 0, 0],
+        //     [0, 0, 1, 1, 0, 0, 0, 0],
+        //     [0, 0, 0, 1, 0, 0, 0, 0],
+        //     [0, 0, 0, 1, 0, 0, 0, 0],
+        //     [0, 0, 1, 0, 1, 0, 0, 0],
+        //     [0, 0, 1, 0, 0, 0, 0, 0],
+        //     [0, 0, 1, 1, 1, 1, 1, 0],
+        // ]
+        // for(var i = 0; i < brush.length; i++) {
+        //     for(var j = 0; j < brush[i].length; j++) {
+        //         gol.poke(x + i, y + j, brush[i][j]);
+        //     }
+        // }
+        gol.paint_in(x, y);
     });
     $canvas.on('mouseup', function(event) {
         _this.drag = null;
@@ -271,8 +342,8 @@ function Controller(gol) {
     $canvas.on('mousemove', function(event) {
         if (_this.drag) {
             var pos = gol.eventCoord(event);
-            gol.poke(pos[0], pos[1], _this.drag == 1);
-            gol.draw();
+            var [x, y] = pos;
+            gol.paint_in(x, y);
         }
     });
     $canvas.on('contextmenu', function(event) {
@@ -282,12 +353,16 @@ function Controller(gol) {
     $(document).on('keyup', function(event) {
         switch (event.which) {
         case 82: /* r */
-            gol.setRandom();
-            gol.draw();
+            // gol.step();
+            //gol.draw();
+            gol.periodic_poke();
             break;
         case 46: /* [delete] */
             gol.setEmpty();
             gol.draw();
+            break;
+        case 32: /* [space] */
+            gol.toggle();
             break;
         case 32: /* [space] */
             gol.toggle();
@@ -307,7 +382,7 @@ function Controller(gol) {
 var gol = null, controller = null;
 $(document).ready(function() {
     var $canvas = $('#life');
-    gol = new GOL($canvas[0]).draw().start();
+    gol = new GOL($canvas[0], 1).draw(); //.start();
     controller = new Controller(gol);
 });
 

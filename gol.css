@@ -1,6 +1,6 @@
 body {
     margin: 10px auto;
-    width: 1024px;
+
     background: black;
     font-family: sans-serif;
     user-select: none;
@@ -21,6 +21,9 @@ h2 {
 
 canvas {
     border: 1px solid #333;
+    width: 2048px;
+    height: 1024px;
+    image-rendering: pixelated;
 }
 
 div.description {
