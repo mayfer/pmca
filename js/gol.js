@@ -69,21 +69,6 @@ GOL.compact = function(state) {
     return compact.buffer;
 };
 
-/**
- * Expand a simulation state from a bit array.
- * @param {ArrayBuffer} compact Compacted bit array
- * @returns {Object} Array-like state object
- */
-GOL.expand = function(buffer) {
-    var compact = new Uint8Array(buffer),
-        state = new Uint8Array(compact.length * 8);
-    for (var i = 0; i < state.length; i++) {
-        var ii = Math.floor(i / 8),
-            shift = i % 8;
-        state[i] = (compact[ii] >> shift) & 1;
-    }
-    return state;
-};
 
 /**
  * Set the entire simulation state at once.
@@ -216,9 +201,16 @@ GOL.prototype.periodic_poke = function() {
         this.counter = 0;
     }
     //if(this.counter == 0) {
-    if(Math.random() < 0.1) {
-    //if(this.counter % 7 === 0 && this.counter < 200) {
-        this.poke(Math.round(this.width/2), Math.round(this.height/2), 1);
+    //if(Math.random() < 0.1) {
+    if(this.counter % 3 === 0 && this.counter < 50) {
+        // let center = [Math.floor(this.width/2), Math.floor(this.height/2)];
+        let center = [150, 150];
+        this.poke(center[0], center[1], 1);
+        let spacer = 1;
+        this.poke(center[0]+spacer, center[1]+spacer, 1);
+        this.poke(center[0]+spacer, center[1]-spacer, 1);
+        this.poke(center[0]-spacer, center[1]-spacer, 1);
+        this.poke(center[0]-spacer, center[1]+spacer, 1);
     }
     gol.step();
     gol.draw();

@@ -21,9 +21,14 @@ h2 {
 
 canvas {
     border: 1px solid #333;
-    width: 2048px;
+    width: 1024px;
     height: 1024px;
-    image-rendering: pixelated;
+
+        image-rendering: pixelated;
+      
+        /* Safari seems to support, but seems deprecated and does the same thing as the others. */
+        image-rendering: -webkit-optimize-contrast;
+        transform: scale(1);
 }
 
 div.description {
