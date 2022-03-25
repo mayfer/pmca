@@ -202,7 +202,8 @@ GOL.prototype.periodic_poke = function() {
     }
     //if(this.counter == 0) {
     //if(Math.random() < 0.1) {
-    if(this.counter % 3 === 0 && this.counter < 50) {
+    //if(this.counter % (3*3*3) === 0 && this.counter < 500) {
+    if(this.counter % (3) === 0) {
         // let center = [Math.floor(this.width/2), Math.floor(this.height/2)];
         let center = [150, 150];
         this.poke(center[0], center[1], 1);
