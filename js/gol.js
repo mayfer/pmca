@@ -205,7 +205,7 @@ GOL.prototype.periodic_poke = function() {
     //if(this.counter % (3*3*3) === 0 && this.counter < 500) {
     if(this.counter % (3) === 0) {
         // let center = [Math.floor(this.width/2), Math.floor(this.height/2)];
-        let center = [150, 150];
+        let center = [250, 250];
         this.poke(center[0], center[1], 1);
         let spacer = 1;
         this.poke(center[0]+spacer, center[1]+spacer, 1);
@@ -305,6 +305,7 @@ function Controller(gol) {
     var _this = this,
         $canvas = $(gol.igloo.canvas);
     this.drag = null;
+    /*
     $canvas.on('mousedown', function(event) {
         _this.drag = event.which;
         var pos = gol.eventCoord(event);
@@ -339,10 +340,7 @@ function Controller(gol) {
             gol.paint_in(x, y);
         }
     });
-    $canvas.on('contextmenu', function(event) {
-        event.preventDefault();
-        return false;
-    });
+    */
     $(document).on('keyup', function(event) {
         switch (event.which) {
         case 82: /* r */

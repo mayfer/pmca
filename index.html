@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>WebGL Game of Life</title>
+    <title>Prime Modulus Cellular Automata</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" href="gol.css"/>
     <script src="lib/igloo-0.1.0.js"></script>
@@ -10,45 +10,32 @@
   </head>
   <body>
     <!-- Canvas dimensions must be powers of two. -->
-    <canvas id="life"></canvas>
     <div class="description">
-      <p>
-        This Game of Life simulation is running entirely on your
-        graphics card. The simulation state swaps back and forth
-        between two texture buffers in the GPU's memory.
-      </p>
       <h2>Controls</h2>
       <ul>
-        <li>
+        <!-- <li>
           <span class="input">Left-click</span>
           <span class="result">draw live cells</span>
         </li>
         <li>
           <span class="input">Middle/right-click</span>
           <span class="result">draw dead cells</span>
-        </li>
+        </li> -->
         <li>
           <span class="input">[SPACE]</span>
           <span class="result">toggle pause/play</span>
         </li>
         <li>
-          <span class="input">[r]</span>
-          <span class="result">reset to random state</span>
+          <span class="input">[R]</span>
+          <span class="result">Step forward</span>
         </li>
         <li>
           <span class="input">[DEL]</span>
           <span class="result">clear the simulation state</span>
         </li>
-        <li>
-          <span class="input">s</span>
-          <span class="result">snapshot the simulation state</span>
-        </li>
-        <li>
-          <span class="input">shift+s</span>
-          <span class="result">restore from snapshot</span>
-        </li>
       </ul>
     </div>
+    <canvas id="life"></canvas>
     <div class="fps">
     </div>
   </body>

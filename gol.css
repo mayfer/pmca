@@ -7,10 +7,10 @@ body {
     -moz-user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
+    color :#fff;
 }
 
 h1, h2 {
-    color: salmon;
     text-align: center;
     margin: 0;
 }
@@ -21,6 +21,8 @@ h2 {
 
 canvas {
     border: 1px solid #333;
+    margin: 0 auto;
+    display: block;
     width: 1024px;
     height: 1024px;
 
@@ -32,7 +34,6 @@ canvas {
 }
 
 div.description {
-    color: salmon;
     width: 600px;
     margin: 0px auto;
     text-indent: 1em;
@@ -57,7 +58,6 @@ ul li span {
 
 ul {
     list-style-type: none;
-    color: pink;
 }
 
 ul li .input {

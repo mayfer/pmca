@@ -7,7 +7,7 @@ uniform vec2 scale;
 
 vec4 zero = vec4(0.0, 0.0, 0.0, 1.0);
 vec4 one = vec4(1.0, 1.0, 1.0, 1.0);
-vec4 two = vec4(1.0, 0.0, 1.0, 1.0);
+vec4 two = vec4(1.0, 254./255., 1.0, 1.0);
 vec4 three = vec4(0.0, 1.0, 0.0, 1.0);
 vec4 four = vec4(0.0, 0.0, 1.0, 1.0);
 vec4 five = vec4(0.0, 1.0, 1.0, 1.0);
@@ -19,8 +19,8 @@ const int spread = 1;
 
 int get(vec2 offset) {
     vec2 coord = (gl_FragCoord.xy + offset);
-    float cy = mod(coord.x, pow(3., 6.)*2.);
-    float cx = mod(coord.y, pow(3., 6.)*2.);
+    float cx = mod(coord.x, pow(3., 6.)*2.);
+    float cy = mod(coord.y, pow(3., 6.)*2.);
     vec2 coord_wrap = vec2(cx, cy);
 
     vec4 color = texture2D(state, coord_wrap / scale);
