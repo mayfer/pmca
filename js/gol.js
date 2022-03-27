@@ -200,12 +200,14 @@ GOL.prototype.periodic_poke = function() {
     if(this.counter === undefined) {
         this.counter = 0;
     }
+
+    $('.frame').text('Frame ' + this.counter);
     //if(this.counter == 0) {
     //if(Math.random() < 0.1) {
     //if(this.counter % (3*3*3) === 0 && this.counter < 500) {
     if(this.counter % (3) === 0) {
         // let center = [Math.floor(this.width/2), Math.floor(this.height/2)];
-        let center = [250, 250];
+        let center = [700, 700];
         this.poke(center[0], center[1], 1);
         let spacer = 1;
         this.poke(center[0]+spacer, center[1]+spacer, 1);
@@ -213,9 +215,14 @@ GOL.prototype.periodic_poke = function() {
         this.poke(center[0]-spacer, center[1]-spacer, 1);
         this.poke(center[0]-spacer, center[1]+spacer, 1);
     }
-    gol.step();
-    gol.draw();
+    for(var i = 0; i < 1; i++) {
+        gol.step();
+        gol.draw();
+    }
     this.counter++
+    if(this.counter == 483) {
+        //this.toggle()
+    }
 }
 
 /**
@@ -240,9 +247,13 @@ GOL.prototype.start = function() {
     //this.programs.gol.use().uniform('neighbors', this.neighbors);
 
     this.timer = true;
+    this.throttler = 0;
     let frame = () => {
         window.requestAnimationFrame(() => {
-            gol.periodic_poke();
+            if(this.throttler % 1 == 0) {
+                gol.periodic_poke();
+            }
+            this.throttler += 1;
             if(this.timer) {
                 frame();
             }

@@ -51,6 +51,11 @@ div.description {
     color: #444;
     font-size: 12px;
 }
+.frame {
+    color: #666;
+    text-align: center;
+    padding: 10px;
+}
 
 ul li span {
     display: inline-block;

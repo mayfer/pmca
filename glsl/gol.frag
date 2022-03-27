@@ -5,9 +5,10 @@ precision mediump float;
 uniform sampler2D state;
 uniform vec2 scale;
 
+vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
 vec4 zero = vec4(0.0, 0.0, 0.0, 1.0);
-vec4 one = vec4(1.0, 1.0, 1.0, 1.0);
-vec4 two = vec4(1.0, 254./255., 1.0, 1.0);
+vec4 one = vec4(170.0/255., 210.0/255.0, 185.0/255.0, 1.0);
+vec4 two = vec4(1./255., 200./255., 255./255., 1.0);
 vec4 three = vec4(0.0, 1.0, 0.0, 1.0);
 vec4 four = vec4(0.0, 0.0, 1.0, 1.0);
 vec4 five = vec4(0.0, 1.0, 1.0, 1.0);
@@ -27,7 +28,7 @@ int get(vec2 offset) {
     int result;
     if(color == zero) {
         result = 0;
-    } else if(color == one) {
+    } else if(color == one || color == white) {
         result = 1;
     } else if(color == two) {
         result = 2;
