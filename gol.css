@@ -27,6 +27,8 @@ canvas {
     height: 1024px;
 
         image-rendering: pixelated;
+        image-rendering: crisp-edges;
+
       
         /* Safari seems to support, but seems deprecated and does the same thing as the others. */
         image-rendering: -webkit-optimize-contrast;

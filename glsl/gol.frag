@@ -7,21 +7,27 @@ uniform vec2 scale;
 
 vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
 vec4 zero = vec4(0.0, 0.0, 0.0, 1.0);
-vec4 one = vec4(170.0/255., 210.0/255.0, 185.0/255.0, 1.0);
-vec4 two = vec4(1./255., 200./255., 255./255., 1.0);
-vec4 three = vec4(0.0, 1.0, 0.0, 1.0);
-vec4 four = vec4(0.0, 0.0, 1.0, 1.0);
-vec4 five = vec4(0.0, 1.0, 1.0, 1.0);
-vec4 six = vec4(1.0, 0.0, 1.0, 1.0);
-vec4 seven = vec4(1.0, 1.0, 0.0, 1.0);
-vec4 eight = vec4(0.5, 0.2, 0.0, 1.0);
+vec4 one = vec4(10., 25., 11., 55.) / 255.;
+vec4 two = vec4(165.0, 165.0, 145.0, 155.0) / 255.0;
+vec4 three = vec4(129.0, 190.0, 116.0, 255.0) / 255.0;
+vec4 four = vec4(163.0, 171.0, 120.0, 255.0) / 255.0;
+vec4 five = vec4(182.0, 224.0, 56.0, 255.0) / 255.0;
+vec4 six = vec4(182.0, 224.0, 96.0, 255.0) / 255.0;
+vec4 seven = vec4(120.0, 224.0, 155.0, 255.0) / 255.0;
+vec4 eight = vec4(23.0, 84.0, 21.0, 255.0) / 255.0;
+vec4 nine = vec4(102.0, 224.0, 0.0, 255.0) / 255.0;
+vec4 ten = vec4(122.0, 129.0, 255.0, 255.0) / 255.0;
+vec4 eleven = vec4(0.0, 224.0, 255.0, 255.0) / 255.0;
 
-const int spread = 1;
+const int modulo = 6;
+const int spread = 2;//(modulo - 1) / 2;
+
 
 int get(vec2 offset) {
     vec2 coord = (gl_FragCoord.xy + offset);
-    float cx = mod(coord.x, pow(3., 6.)*2.);
-    float cy = mod(coord.y, pow(3., 6.)*2.);
+    float fmod = float(modulo);
+    float cx = mod(coord.x, 2.0*pow(fmod, 4.0));
+    float cy = mod(coord.y, 2.0*pow(fmod, 4.0));
     vec2 coord_wrap = vec2(cx, cy);
 
     vec4 color = texture2D(state, coord_wrap / scale);
@@ -30,7 +36,7 @@ int get(vec2 offset) {
         result = 0;
     } else if(color == one || color == white) {
         result = 1;
-    } else if(color == two) {
+    } else if(color == two|| color == white) {
         result = 2;
     } else if(color == three) {
         result = 3;
@@ -42,6 +48,14 @@ int get(vec2 offset) {
         result = 6;
     } else if(color == seven) {
         result = 7;
+    } else if(color == eight) {
+        result = 8;
+    } else if(color == nine) {
+        result = 9;
+    } else if(color == ten) {
+        result = 10;
+    } else if(color == eleven) {
+        result = 11;
     } else {
         result = 0;
     }
@@ -55,7 +69,38 @@ int modI(int aI, int bI) {
     return result;
 }
 
+vec4 remainder_to_color(int remainder) {
+    vec4 color;
+    if(remainder == 0) {
+        color = zero;
+    } else if(remainder == 1) {
+        color = one;
+    } else if(remainder == 2) {
+        color = two;
+    } else if(remainder == 3) {
+        color = three;
+    } else if(remainder == 4) {
+        color = four;
+    } else if(remainder == 5) {
+        color = five;
+    } else if(remainder == 6) {
+        color = six;
+    } else if(remainder == 7) {
+        color = seven;
+    } else if(remainder == 8) {
+        color = eight;
+    } else if(remainder == 9) {
+        color = nine;
+    } else if(remainder == 10) {
+        color = ten;
+    } else if(remainder == 11) {
+        color = eleven;
+    } else {
+        color = zero;
+    }
 
+    return color;
+}
 
 void main() {
     int sum = 0;
@@ -63,7 +108,7 @@ void main() {
     int multiplier = 1;
     for(int x = -spread; x<=spread; x++) {
         for(int y = -spread; y<=spread; y++) {
-            if(x == 0 && y == 0) {
+            if(x == 0 && y == 0 && modI(modulo, 2) > 0) {
                 sum += get(vec2(x * multiplier, y * multiplier));
             } else {
                 sum += get(vec2(x * multiplier, y * multiplier));
@@ -72,25 +117,6 @@ void main() {
     }
     
 
-    int remainder = modI(sum, 3);
-
-    if(remainder == 0) {
-        gl_FragColor = zero;
-    } else if(remainder == 1) {
-        gl_FragColor = one;
-    } else if(remainder == 2) {
-        gl_FragColor = two;
-    } else if(remainder == 3) {
-        gl_FragColor = three;
-    } else if(remainder == 4) {
-        gl_FragColor = four;
-    } else if(remainder == 5) {
-        gl_FragColor = five;
-    } else if(remainder == 6) {
-        gl_FragColor = six;
-    } else if(remainder == 7) {
-        gl_FragColor = seven;
-    } else {
-        gl_FragColor = zero;
-    }
+    int remainder = modI(sum, modulo);
+    gl_FragColor = remainder_to_color(remainder);
 }
