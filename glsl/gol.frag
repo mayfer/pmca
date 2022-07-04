@@ -6,11 +6,11 @@ uniform sampler2D state;
 uniform vec2 scale;
 
 vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
-vec4 zero = vec4(0.0, 0.0, 0.0, 1.0);
-vec4 one = vec4(10., 25., 11., 55.) / 255.;
-vec4 two = vec4(165.0, 165.0, 145.0, 155.0) / 255.0;
-vec4 three = vec4(129.0, 190.0, 116.0, 255.0) / 255.0;
-vec4 four = vec4(163.0, 171.0, 120.0, 255.0) / 255.0;
+vec4 zero = vec4(170., 100., 120., 255.0) / 255.;
+vec4 one = vec4(255., 255., 255., 255.) / 255.;
+vec4 two = vec4(0.0, 0.0, 0.0, 255.0) / 255.0;
+vec4 three = vec4(255.0, 50.0, 254.0, 255.0) / 255.0;
+vec4 four = vec4(3.0, 1.0, 2.0, 255.0) / 255.0;
 vec4 five = vec4(182.0, 224.0, 56.0, 255.0) / 255.0;
 vec4 six = vec4(182.0, 224.0, 96.0, 255.0) / 255.0;
 vec4 seven = vec4(120.0, 224.0, 155.0, 255.0) / 255.0;
@@ -19,15 +19,15 @@ vec4 nine = vec4(102.0, 224.0, 0.0, 255.0) / 255.0;
 vec4 ten = vec4(122.0, 129.0, 255.0, 255.0) / 255.0;
 vec4 eleven = vec4(0.0, 224.0, 255.0, 255.0) / 255.0;
 
-const int modulo = 6;
-const int spread = 2;//(modulo - 1) / 2;
+const int modulo = 3;
+const int spread = (modulo - 1) / 2;
 
 
 int get(vec2 offset) {
     vec2 coord = (gl_FragCoord.xy + offset);
     float fmod = float(modulo);
-    float cx = mod(coord.x, 2.0*pow(fmod, 4.0));
-    float cy = mod(coord.y, 2.0*pow(fmod, 4.0));
+    float cx = mod(coord.x, 3.0*pow(fmod, 6.0));
+    float cy = mod(coord.y, 3.0*pow(fmod, 6.0));
     vec2 coord_wrap = vec2(cx, cy);
 
     vec4 color = texture2D(state, coord_wrap / scale);
@@ -101,7 +101,15 @@ vec4 remainder_to_color(int remainder) {
 
     return color;
 }
+/*
+vec4 get_color_for_value(int value) {
+    
+}
 
+int get_value_for_color(vec4 color) {
+
+}
+*/
 void main() {
     int sum = 0;
 

@@ -225,25 +225,28 @@ GOL.prototype.periodic_poke = function() {
     let per_frame = this.counter == 0 ? 1 : 1;
     for(var i = 0; i < per_frame; i++) {
         //if(this.counter == 0) {
-        if(this.counter % (9) == 0 && this.counter < 2900 ) {
+        if( (this.counter % (1) == 0) ) {
+        //if( this.counter % (3) == 0) {
 
         //if(isFibonacci(this.counter)) {
         //if(Math.random() < 0.9) {
             // let center = [Math.floor(this.width/2), Math.floor(this.height/2)];
             // let center = [1024, 1024];
-            let center = [102, 102];
+            let center = [2048, 2048];
             this.poke(center[0], center[1], 1);
-            let spacer = 0;
+            let spacer = 3;
             
             // this.poke(center[0]+spacer, center[1]+spacer, 1);
             // this.poke(center[0]+spacer, center[1]-spacer, 1);
             // this.poke(center[0]-spacer, center[1]-spacer, 1);
             // this.poke(center[0]-spacer, center[1]+spacer, 1);
 
-            this.poke(center[0], center[1]+spacer, 1);
-            this.poke(center[0], center[1]-spacer, 1);
-            this.poke(center[0]+spacer, center[1], 1);
-            this.poke(center[0]-spacer, center[1], 1);
+            if( (this.counter % (27) == 0 )) {
+                this.poke(center[0], center[1]+spacer, 1);
+                this.poke(center[0], center[1]-spacer, 1);
+                this.poke(center[0]+spacer, center[1], 1);
+                this.poke(center[0]-spacer, center[1], 1);
+            }
         }
         gol.step();
         gol.draw();
@@ -279,7 +282,7 @@ GOL.prototype.start = function() {
     this.throttler = 0;
     let frame = () => {
         window.requestAnimationFrame(() => {
-            if(this.timer && this.throttler % 28 == 0) {
+            if(this.timer && this.throttler % 1 == 0) {
                 gol.periodic_poke();
             }
             this.throttler += 1;
