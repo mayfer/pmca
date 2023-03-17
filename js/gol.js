@@ -21,10 +21,12 @@ function GOL(canvas, scale) {
     this.timer = null;
     this.lasttick = GOL.now();
     this.fps = 0;
+    this.time = 0;
 
     this.width = w;
     this.height = h;
     console.log(w, h)
+
 
     gl.disable(gl.DEPTH_TEST);
     this.programs = {
@@ -130,6 +132,7 @@ GOL.prototype.swap = function() {
  * @returns {GOL} this
  */
 GOL.prototype.step = function() {
+    this.time++;
     if (GOL.now() != this.lasttick) {
         $('.fps').text(this.fps + ' FPS');
         this.lasttick = GOL.now();
@@ -141,10 +144,12 @@ GOL.prototype.step = function() {
     this.framebuffers.step.attach(this.textures.back);
     this.textures.front.bind(0);
     gl.viewport(0, 0, this.statesize[0], this.statesize[1]);
+
     this.programs.gol.use()
         .attrib('quad', this.buffers.quad, 2)
         .uniformi('state', 0)
         .uniform('scale', this.statesize)
+        .uniform('time', this.time)
         .draw(gl.TRIANGLE_STRIP, 4);
     this.swap();
     return this;
@@ -155,6 +160,8 @@ GOL.prototype.step = function() {
  * @returns {GOL} this
  */
 GOL.prototype.draw = function() {
+    this.time++;
+
     var gl = this.igloo.gl;
     this.igloo.defaultFramebuffer.bind();
     this.textures.front.bind(0);
@@ -163,6 +170,7 @@ GOL.prototype.draw = function() {
         .attrib('quad', this.buffers.quad, 2)
         .uniformi('state', 0)
         .uniform('scale', this.viewsize)
+        .uniform('time', this.time)
         .draw(gl.TRIANGLE_STRIP, 4);
     return this;
 };
@@ -196,27 +204,29 @@ GOL.prototype.get = function() {
     return state;
 };
 
+
+function isFibonacci(num, a = 0, b = 1) {
+    if(num === 0 || num === 1) {
+      return true;
+    }
+  
+    let nextNumber = a+b;
+  
+    if(nextNumber === num) {
+      return true;
+    }
+    else if(nextNumber > num) {
+      return false;
+    }
+  
+   return isFibonacci(num, b, nextNumber);
+}
+
 GOL.prototype.periodic_poke = function() {
     if(this.counter === undefined) {
         this.counter = 0;
     }
 
-    function isFibonacci(num, a = 0, b = 1) {
-        if(num === 0 || num === 1) {
-          return true;
-        }
-      
-        let nextNumber = a+b;
-      
-        if(nextNumber === num) {
-          return true;
-        }
-        else if(nextNumber > num) {
-          return false;
-        }
-      
-       return isFibonacci(num, b, nextNumber);
-      }
 
     $('.frame').text('Frame ' + this.counter);
     //if(Math.random() < 0.1) {
@@ -224,29 +234,36 @@ GOL.prototype.periodic_poke = function() {
     //if(isFibonacci(this.counter)) {
     let per_frame = this.counter == 0 ? 1 : 1;
     for(var i = 0; i < per_frame; i++) {
-        //if(this.counter == 0) {
-        if( (this.counter % (1) == 0) ) {
+        let center = [2048, 2048];
+        let spacer = 81;
+        if(this.counter == 0) {
+        // if( (this.counter % (9) == 0) ) {
         //if( this.counter % (3) == 0) {
 
         //if(isFibonacci(this.counter)) {
         //if(Math.random() < 0.9) {
             // let center = [Math.floor(this.width/2), Math.floor(this.height/2)];
             // let center = [1024, 1024];
-            let center = [2048, 2048];
             this.poke(center[0], center[1], 1);
-            let spacer = 3;
             
-            // this.poke(center[0]+spacer, center[1]+spacer, 1);
-            // this.poke(center[0]+spacer, center[1]-spacer, 1);
-            // this.poke(center[0]-spacer, center[1]-spacer, 1);
-            // this.poke(center[0]-spacer, center[1]+spacer, 1);
+            this.poke(center[0]+spacer, center[1]+spacer, 1);
+            this.poke(center[0]+spacer, center[1]-spacer, 1);
+            this.poke(center[0]-spacer, center[1]-spacer, 1);
+            this.poke(center[0]-spacer, center[1]+spacer, 1);
 
-            if( (this.counter % (27) == 0 )) {
-                this.poke(center[0], center[1]+spacer, 1);
-                this.poke(center[0], center[1]-spacer, 1);
-                this.poke(center[0]+spacer, center[1], 1);
-                this.poke(center[0]-spacer, center[1], 1);
-            }
+        }
+        if( (this.counter % (17) == 1 )) {
+            this.poke(center[0], center[1]+spacer, 1);
+            this.poke(center[0], center[1]-spacer, 1);
+            this.poke(center[0]+spacer, center[1], 1);
+            this.poke(center[0]-spacer, center[1], 1);
+        }
+
+        if( (false && this.counter % (1) == 0 )) {
+            this.poke(center[0]+spacer, center[1]+spacer, 1);
+            this.poke(center[0]+spacer, center[1]-spacer, 1);
+            this.poke(center[0]-spacer, center[1]+spacer, 1);
+            this.poke(center[0]-spacer, center[1]-spacer, 1);
         }
         gol.step();
         gol.draw();
@@ -282,7 +299,8 @@ GOL.prototype.start = function() {
     this.throttler = 0;
     let frame = () => {
         window.requestAnimationFrame(() => {
-            if(this.timer && this.throttler % 1 == 0) {
+            const slowness = this.time > 300 ? 5 : 1;
+            if(this.timer && this.throttler % slowness == 0) {
                 gol.periodic_poke();
             }
             this.throttler += 1;
@@ -334,10 +352,10 @@ GOL.prototype.eventCoord = function(event) {
 
 GOL.prototype.paint_in = function(x, y) {
     let val = 1;
-    gol.poke(x, y, val);
-    gol.poke(x+1, y+1, val);
-    gol.poke(x, y+1, val);
-    gol.poke(x+1, y, val);
+    gol.poke(x, y, 1);
+    // gol.poke(x+1, y+1, val);
+    // gol.poke(x, y+1, val);
+    // gol.poke(x+1, y, val);
     gol.draw();
 }
 
@@ -349,13 +367,13 @@ function Controller(gol) {
     var _this = this,
         $canvas = $(gol.igloo.canvas);
     this.drag = null;
-    /*
+    
     $canvas.on('mousedown', function(event) {
         _this.drag = event.which;
         var pos = gol.eventCoord(event);
         var [x, y] = pos;
-        x -= $canvas.offset().left;
-        y -= $canvas.offset().top;
+        //x -= $canvas.offset().left;
+        //y -= $canvas.offset().top;
 
         console.log(x, y);
 
@@ -383,12 +401,12 @@ function Controller(gol) {
         if (_this.drag) {
             var pos = gol.eventCoord(event);
             var [x, y] = pos;
-            x -= $canvas.offset().left;
-            y -= $canvas.offset().top;
+            // x -= $canvas.offset().left;
+            // y -= $canvas.offset().top;
             gol.paint_in(x, y);
         }
     });
-    */
+    
     
     $(document).on('keyup', function(event) {
         switch (event.which) {
